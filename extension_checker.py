@@ -95,40 +95,70 @@ def check_ext_list(path, must_file=None, can_file=None):
 
     not_in_can = []
     res = True
+    if args.all_profiles:
+        profiles = get_profiles()
+    else:
+        profiles = get_profiles(True)
 
-    for ext in os.listdir(path):
-        if ext == "Temp":
+    path_bak = path
+
+    for profile in profiles:
+        path = os.path.join(path_bak, profile, 'Extensions')
+        if not os.path.isdir(path):
             continue
-        print(ext)
-        logtofile("\nExtension ID:  " + ext)
-        ext_path = os.path.join(path, ext)
-        for ver in os.listdir(ext_path):
-            ver_path = os.path.join(ext_path, ver)
-            data = extract_data(ver_path)
-            print("\t Name: %s" % data.get("name"))
-            logtofile("\nName: %s" % data.get("name"))
-            logtofile("     Version: %s   " % data.get("version"))
-            print("\t Version: %s" % data.get("version"))
-            print("\t Description: %s" % data.get("description"))
-            logtofile("Description: %s" % data.get("description"))
-            if can is not None:
-                if data["name"] not in can:
-                    print("  ERROR: this extension is not allowed or might be unwanted! ")
-                    logtofile("      ERROR: this extension is not allowed or might be unwanted!")
-                    not_in_can.append(data)
-                    res = False
-            if must is not None:
-                if data.get("name") in must:
-                    must.remove(data.get("name"))
-            print("\n")
-            logtofile()
-    if must is not None and len(must) > 0:
-        print("There are missing extensions:")
-        print(", ".join(must))
-        logtofile("ERROR!   There are missing extensions:  ")
-        logtofile("> ".join(must))
-        res = False
+        print(profile.center(60, "="))
+        for ext in os.listdir(path):
+            if ext == "Temp":
+                continue
+            print(ext)
+            logtofile("\nExtension ID:  " + ext)
+            ext_path = os.path.join(path, ext)
+            for ver in os.listdir(ext_path):
+                ver_path = os.path.join(ext_path, ver)
+                data = extract_data(ver_path)
+                print("\t Name: %s" % data.get("name"))
+                logtofile("\nName: %s" % data.get("name"))
+                logtofile("     Version: %s   " % data.get("version"))
+                print("\t Version: %s" % data.get("version"))
+                print("\t Description: %s" % data.get("description"))
+                logtofile("Description: %s" % data.get("description"))
+                if can is not None:
+                    if data["name"] not in can:
+                        print("  ERROR: this extension is not allowed or might be unwanted! ")
+                        logtofile("      ERROR: this extension is not allowed or might be unwanted!")
+                        not_in_can.append(data)
+                        res = False
+                if must is not None:
+                    if data.get("name") in must:
+                        must.remove(data.get("name"))
+                print("\n")
+                logtofile()
+        if must is not None and len(must) > 0:
+            print("There are missing extensions:")
+            print(", ".join(must))
+            logtofile("ERROR!   There are missing extensions:  ")
+            logtofile("> ".join(must))
+            res = False
     return res
+
+
+def get_profiles(last=False):
+    profiles = []
+    try:
+        old_dir = os.getcwd()
+        os.chdir(args.config_path)
+        if last:
+            profiles = [load_json('Local State')['profile']['last_used']]
+        else:
+            profiles = [profile for profile in load_json('Local State')['profile']['info_cache']]
+    except:
+        print("No profiles found")
+        return profiles
+    finally:
+        os.chdir(old_dir)
+    if profiles:
+        print("Profiles to check: %s" % ', '.join(profiles))
+    return profiles
 
 
 if __name__ == "__main__":
@@ -138,22 +168,20 @@ if __name__ == "__main__":
     if "windows" in platform.system().lower():
         parser.add_argument("--config_path", help="The browser config path",
                             default=os.path.join(os.path.expanduser("~"),
-                                                 "AppData", "local", "Avira-Browser",
-                                                 "User Data", "Default", "Extensions"))
+                                                 "AppData", "local", "Avira-Browser", "User Data"))
     elif "darwin" in platform.system().lower():
         parser.add_argument("--config_path", help="The browser config path",
                             default=os.path.join(os.path.expanduser("~"),
-                                                 "Library", "Application Support", "Avira-Browser",
-                                                 "Default", "Extensions"))
+                                                 "Library", "Application Support", "Avira-Browser"))
     else:
         parser.add_argument("--config_path", help="The browser config path",
                             default=os.path.join(os.path.expanduser("~"),
-                                                 ".config", "avira-browser",
-                                                 "Default", "Extensions"))
+                                                 ".config", "avira-browser"))
     parser.add_argument("--must_extensions", help="json file with extensions that must be installed",
                         default="must.json")
     parser.add_argument("--can_extensions", help="json file with extensions that can be installed",
                         default="can.json")
+    parser.add_argument('--all_profiles', "--all", help="Shows extensions info for all profiles", action="store_true")
 
     args = parser.parse_args()
 
