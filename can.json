@@ -1,10 +1,12 @@
 ["DuckDuckGo for Chrome",
   "Ghostery",
   "Adblock Plus",
+  "AdBlock",
   "Privacy Badger",
   "Google Wallet",
   "Avira Browser Safety",
   "HTTPS Everywhere",
   "Avira SafeSearch",
-  "Ranorex Automation"
+  "Ranorex Automation",
+  "IFrame monitor experiment"
 ]
