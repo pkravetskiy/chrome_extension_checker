@@ -103,7 +103,7 @@ def check_ext_list(path, must_file=None, can_file=None):
     path_bak = path
 
     for profile in profiles:
-        path = os.path.join(path_bak, profile, 'Extensions')
+        path = os.path.join(path_bak, profile, "Extensions")
         if not os.path.isdir(path):
             continue
         print(profile.center(60, "="))
@@ -142,22 +142,22 @@ def check_ext_list(path, must_file=None, can_file=None):
     return res
 
 
-def get_profiles(last=False):
+def get_profiles(only_current=False):
     profiles = []
     try:
         old_dir = os.getcwd()
         os.chdir(args.config_path)
-        if last:
-            profiles = [load_json('Local State')['profile']['last_used']]
+        if only_current:
+            profiles = [load_json("Local State")["profile"].get("last_used", "Default")]
         else:
-            profiles = [profile for profile in load_json('Local State')['profile']['info_cache']]
+            profiles = [profile for profile in load_json("Local State")["profile"]["info_cache"]]
     except:
         print("No profiles found")
         return profiles
     finally:
         os.chdir(old_dir)
     if profiles:
-        print("Profiles to check: %s" % ', '.join(profiles))
+        print("Profiles to check: %s" % ", ".join(profiles))
     return profiles
 
 
@@ -181,7 +181,7 @@ if __name__ == "__main__":
                         default="must.json")
     parser.add_argument("--can_extensions", help="json file with extensions that can be installed",
                         default="can.json")
-    parser.add_argument('--all_profiles', "--all", help="Shows extensions info for all profiles", action="store_true")
+    parser.add_argument("--all_profiles", "--all", help="Shows extensions info for all profiles", action="store_true")
 
     args = parser.parse_args()
 
