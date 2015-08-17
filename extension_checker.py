@@ -84,12 +84,7 @@ def check_ext_list(path, must_file=None, can_file=None):
     :return: True if everything was allright
     """
     if not os.path.isdir(path):
-        if "darwin" in platform.system().lower():
-            path = path.replace("/Default/", "/Profile 1/", 1)
-            if not os.path.isdir(path):
-                sys.exit("%s does not exist" % path)
-        else:
-            sys.exit("%s does not exist" % path)
+        sys.exit("%s does not exist" % path)
     must = load_json(must_file)
     can = load_json(can_file)
 
@@ -107,6 +102,7 @@ def check_ext_list(path, must_file=None, can_file=None):
         if not os.path.isdir(path):
             continue
         print(profile.center(60, "="))
+        logtofile("\n" + profile.center(60, "="))
         for ext in os.listdir(path):
             if ext == "Temp":
                 continue
@@ -158,6 +154,7 @@ def get_profiles(only_current=False):
         os.chdir(old_dir)
     if profiles:
         print("Profiles to check: %s" % ", ".join(profiles))
+        logtofile("Profiles to check: %s" % ", ".join(profiles))
     return profiles
 
 
