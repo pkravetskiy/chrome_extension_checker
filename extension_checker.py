@@ -69,10 +69,10 @@ def logtofile(txt="\n"):
 
 
 def load_json(filename):
-    if filename is None:
-        return None
-    with open(filename) as fh:
-        return json.load(fh)
+    if filename and os.path.isfile(filename):
+        with open(filename) as fh:
+            return json.load(fh)
+    return None
 
 
 def check_ext_list(path, must_file=None, can_file=None):
