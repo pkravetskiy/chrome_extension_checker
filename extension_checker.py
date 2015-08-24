@@ -88,6 +88,7 @@ def list_of_permissions(data):
     if data and "permissions" in data:
         lst = [permission for permission in data["permissions"]]
     return lst
+<<<<<<< HEAD
 
 
 def show_permissions_info(permlist):
@@ -95,6 +96,8 @@ def show_permissions_info(permlist):
         for permission in permlist:
             if permission in permissions_info:
                 logging.info('\t%s: %s', permission, permissions_info[permission])
+=======
+>>>>>>> 1c2a787928b43a587e099151d2595744bdd72383
 
 
 def check_ext_list(path, must_file=None, can_file=None):
